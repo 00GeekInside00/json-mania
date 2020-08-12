@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content%}
+
+        <v-row align="center" justify="center">
+                <v-col cols="12" sm="8" md="4">
+                   
+<form role="form" class="form-horizontal" method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        {% for field in form %}
+        
+        {% if field.label == "Password" %}
+        <div class="input-group">
+            <v-text-field type="password" id="{{ field.id_for_label }}" name="{{ field.html_name }}" label="{{field.label}}" required></v-text-field>
+        </div>
+        {% else %}
+        <div class="input-group">
+            <v-text-field id="{{ field.id_for_label }}" name="{{ field.html_name }}" label="{{field.label}}" required></v-text-field>
+        </div>
+        {% endif %}
+        
+        {% if form.non_field_errors %}
+ 
+        <v-snackbar v-model="invalid" color="red" :vertical=true>
+            {{ form.non_field_errors }}
+        
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" text v-bind="attrs" @click="invalid = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
+        {% endif %}
+            
+        {% endfor %}
+        <v-btn type="submit" class="success" value="login" />login</v-btn>
+        <input type="hidden" name="next" value="{{ next }}" />
+    </div>
+</form>
+<a href="{{ HTTP_HOST }}/accounts/signup/">Create a new account</a>
+</v-col>
+</v-row>
+{% endblock %}
+{% block vue-data %}
+            invalid: true,
+            username: '',
+            password: '',
+            passwordRules: [
+                v => !!v || 'Password is required',
+            ],
+            usernameRules: [
+                v => !!v || 'Username is required',
+            ]
+
+{% endblock %}
+{% block vue-methods%}
+            register() {
+                this.$refs.form.validate()
+            },
+{% endblock %}

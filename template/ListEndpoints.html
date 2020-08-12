@@ -1,0 +1,42 @@
+{% extends "base.html"%}
+{% block content %}
+<h1>My Endpoints:</h1>
+{% if storage%}
+<a href="{{HTTP_HOST}}/storage/create/">Create New Endpoint</a>
+<v-simple-table fixed-header  class="elevation-4">
+        <template v-slot:default>
+    <thead>
+        <tr>
+            <th class="text-center">Storage Title</th>
+            <th class="text-center">Project</th>
+            <th class="text-center">Url</th>
+            <!-- <th class="text-center">Status Tweaks</th> -->
+            <th class="text-center"></th>
+
+        </tr>
+    </thead>
+        <tbody>
+    {% for item in storage %}
+    <tr>
+        <td class="text-center">{{ item.url }}</td> 
+        <td class="text-center">{{ item.project.name }}</td>
+        <td class="text-center"><a href="{{HTTP_HOST}}/{{item.storage_id}}/{{item.url}}">{{HTTP_HOST}}/{{item.storage_id}}/{{ item.url }}</a></td> 
+        <!-- <td class="text-center">Coming Soon</td> -->
+        <td class="text-center"><v-btn href="{{HTTP_HOST}}/storage/delete/{{item.id}}" class="error">Delete Endpoint</v-btn></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </template>
+</v-simple-table>
+
+{% else %}
+<v-alert  border="left" colored-border type="warning" elevation="2">You don't have any endpoints. <a href="{{HTTP_HOST}}/storage/create/">Create one now</a></v-alert>
+{% endif %}
+
+
+
+
+{% endblock %}
+{% block vue-data %}
+
+{% endblock %}

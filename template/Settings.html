@@ -1,0 +1,42 @@
+<v-form ref="form" v-model="valid" lazy-validation>
+
+    <v-text-field v-model="username" :rules="nameRules" label="username" required></v-text-field>
+    <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
+    <v-text-field v-model="password" :rules="passwordRules" label="password" required></v-text-field>
+
+
+    <v-btn :disabled="!valid" color="success" class="mr-4" @click="register">
+        register
+    </v-btn>
+
+
+</v-form>
+
+<script>
+    export default {
+        data: () => ({
+            valid: true,
+            username: '',
+            email: '',
+            password: '',
+            emailRules: [
+                v => !!v || 'E-mail is required',
+                v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+            ],
+            passwordRules: [
+                v => !!v || 'password is required',
+            ],
+            usernameRules: [
+                v => !!v || 'Username is required',
+            ]
+        }),
+
+        methods: {
+            register() {
+                this.$refs.form.validate()
+            },
+
+        },
+        delimiters: ["[[", "]]"]
+    }
+</script>

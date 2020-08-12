@@ -1,0 +1,96 @@
+
+
+{% extends "base.html" %}
+{% block content%}
+
+<v-row align="center" justify="center">
+   <v-col cols="12" sm="8" md="4">
+      <form   method="post" >
+         {% csrf_token %}
+         <div class="form-group">
+            {% for field in form %}
+            {% if field.label == "Password" or field.label == "Password confirmation"  %}
+            <div class="input-group">
+               <v-text-field type="password" id="{{ field.id_for_label }}" name="{{ field.html_name }}"
+                  label="{{field.label}}"></v-text-field>
+            </div>
+            {% if  form.password1.errors %}
+            <v-alert v-model="invalid" dense outlined type="error">
+              password: {{ form.password1.errors }}
+            </v-alert>
+            {% endif %}
+            {% if  form.password2.errors %}
+            <v-alert v-model="invalid" dense outlined type="error">
+              password confirmation: {{ form.password2.errors }}
+            </v-alert>
+            {% endif %}
+            {% elif field.label == "Email" %}
+            <div class="input-group">
+               <v-text-field type="email" id="{{ field.id_for_label }}" name="{{ field.html_name }}"
+                  label="{{field.label}}"></v-text-field>
+            </div>
+            {% if  form.email.errors %}
+            <v-alert v-model="invalid" dense outlined type="error">
+              Email: {{ form.email.errors }}
+            </v-alert>
+            {% endif %}
+            {% else %}
+            <div class="input-group">
+               <v-text-field id="{{ field.id_for_label }}" name="{{ field.html_name }}" label="{{field.label}}">
+               </v-text-field>
+            </div>
+            {% if  form.username.errors %}
+            <v-alert v-model="invalid" dense outlined type="error">
+              Username {{ form.username.errors }}
+            </v-alert>
+            {% endif %}
+            {% endif %}
+            {% if form.non_field_errors %}
+            <v-snackbar v-model="invalid" color="red" :vertical=true>
+               {{ form.non_field_errors }}
+               <template v-slot:action="{ attrs }">
+                  <v-btn color="white" text v-bind="attrs" @click="invalid = false">
+                     Close
+                  </v-btn>
+               </template>
+            </v-snackbar>
+            {% endif %}
+            {% if  form.field.errors %}
+            <v-snackbar v-model="invalid" color="red" :vertical=true>
+               {{ form.field.errors }}
+               <template v-slot:action="{ attrs }">
+                  <v-btn color="white" text v-bind="attrs" @click="invalid = false">
+                     Close
+                  </v-btn>
+               </template>
+            </v-snackbar>
+            {% endif %}
+            {% if  form.field.errors %}
+            <v-alert v-model="invalid" color="red" :vertical=true>
+               {{ form..errors }}
+               <template v-slot:action="{ attrs }">
+                  <v-btn color="white" text v-bind="attrs" @click="invalid = false">
+                     Close
+                  </v-btn>
+               </template>
+            </v-alert>
+            {% endif %}
+            {% endfor %}
+            <v-btn type="submit" class="success" value="signup" />
+            Sign up</v-btn>
+            <input type="hidden" name="next" value="{{ next }}" />
+         </div>
+      </form>
+      <a href="{{ HTTP_HOST }}/accounts/login/">Sign in</a>
+   </v-col>
+
+</v-row>
+{% endblock %}
+{% block vue-data %}
+invalid: true,
+username: '',
+password: '',
+{% endblock %}
+{% block vue-methods%}
+{% endblock %}
+

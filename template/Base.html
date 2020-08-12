@@ -1,0 +1,105 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Json Mania</title>
+</head>
+
+<body>
+    <div id="app">
+        
+        
+        
+        <v-toolbar dark  src="https://miro.medium.com/max/3840/0*8LdBw2LBM0U4AVyA.jpg">
+        
+        {% if user.username %}
+        <v-app-bar-nav-icon @click="drawer =! drawer"></v-app-bar-nav-icon>
+        {% endif %}
+            
+            <v-toolbar-title><b>J</b>son|<b>M</b>ania</v-toolbar-title>
+            
+            {% if user.username %}
+            <v-spacer></v-spacer>
+            
+            <v-btn icon href="{% url 'logout' %}?next=/accounts/login/">
+                 
+                <v-icon>mdi-power</v-icon>
+                
+            </v-btn>
+            
+            {% endif %}
+                
+        </v-toolbar>
+        
+        <v-app>
+            
+            {% if user.username %}
+            <v-navigation-drawer v-model="drawer" style="z-index:10" left src="https://miro.medium.com/max/3840/0*8LdBw2LBM0U4AVyA.jpg" absolute dark>
+                <v-list dense nav >
+                    <v-list-item two-line >
+            
+                        <v-list-item-content>
+                            <v-list-item-title><h2>{{user.username}}</h2></v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+            
+                    <v-divider></v-divider>
+            
+                    <v-list-item v-for="item in items" :key="item.item"  :href='item.url'>
+                        <v-list-item-content>
+                            [[ item.item ]]
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-navigation-drawer>
+            {% endif %}
+                
+
+            <v-main>
+                <v-container> 
+                {% block content%}{% endblock %}
+                </v-container> 
+            </v-main>
+
+     
+                <v-footer absolute class="font-weight-medium" dark>
+                    <v-col class="text-center" cols="12">
+                        [[new Date().getFullYear() ]] — <strong>JsonMania</strong>
+                    </v-col>
+                </v-footer>
+          
+        </v-app>
+    </div>
+
+
+
+
+    {% block imports %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data:{
+                drawer:false,
+                {% if user.username %}
+                items:[{item:"My Endpoints", url:"{{ HTTP_HOST }}/storage/list/"}, { item: "Create Endpoint", url:"{{HTTP_HOST}}/storage/create/"}],
+                {% endif %}
+                {% block vue-data %}{% endblock %}
+            }, 
+            methods: {
+                {% block vue-methods%}{% endblock %}
+        },
+            mounted(){
+                {% block vue-mounted %}{% endblock %}
+            },
+            delimiters:["[[","]]"]
+        })
+    </script>
+</body>
+
+</html>

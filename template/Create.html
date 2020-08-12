@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Create Endpoint:</h1>
+<a href="{{HTTP_HOST}}/storage/list/">List My Endpoints</a>
+<form ref="form" method="post" lazy-validation>
+{% csrf_token %}
+ 
+    <v-text-field v-show="listofprojects.length" name="url" label="title" v-model="title" required></v-text-field>
+
+          <v-layout>
+        <v-container fluid>  
+         <v-flex row >
+        <v-select
+        value.sync="project"
+        v-model="selected"
+        :items="listofprojects"
+        item-value="id"
+        item-text="name"
+        label="Project"
+        v-show="listofprojects.length"
+      >
+    </v-select>
+    <input type="hidden" v-show="listofprojects.length" v-model="selected" name="project" required/>
+    <!-- TODO: Create Groups -->
+    <div>
+    <v-alert v-show="!listofprojects.length"  border="left" colored-border type="warning" elevation="2">  You don't have any projects available.</v-alert> 
+    </div>
+  </v-container>
+
+              <v-spacer></v-spacer>
+            <v-btn class="info mt-6"  @click="projectDialog = !projectDialog">
+               Create New Project
+            </v-btn>
+   
+            </v-layout>
+
+    <v-btn  type="submit" v-show="listofprojects.length" :disabled="selected<=0" color="success" class="ma-4" >
+        Create Endpoint 
+    </v-btn>
+
+
+
+
+
+
+
+<!--Project Dialog-->
+
+<v-row justify="center">
+    <v-dialog v-model="projectDialog" persistent max-width="600px">
+            <v-form v-on:submit.prevent>
+      <v-card>
+        <v-card-title>
+          <span class="headline">Create Project</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+
+              <v-col cols="12">
+              <span class="red--text" v-if="formError">Please Specify Project Name.</span><br>
+              <span class="red--text" v-if="error">Server is not available at the time.</span><br>
+
+                <v-text-field label="Project Name" v-model="pName" required></v-text-field>
+              </v-col>
+              <p v-if="listofprojects">
+              Your Existing Projects:
+              <v-list>
+              <v-list-item v-for="project in listofprojects">
+              <v-list-item-content>[[project.name]]</v-list-item-content>
+               <v-spacer></v-spacer>
+               <v-btn class="error" @click="deleteProject([[project.id]],[[project.name]])">
+               <span>Delete Project</span>
+               <v-icon >mdi-delete</v-icon>
+               </v-btn>
+              </v-list-item>
+              <v-divider></v-divider>
+              </v-list>
+            
+              </p>
+              
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="projectDialog = false">Close</v-btn>
+          <v-btn type="submit"  color="blue darken-1" text @click="createProject()">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+      </v-form>
+    </v-dialog>
+  </v-row>
+
+</form>
+{% endblock %}
+{% block imports %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js" integrity="sha512-VZ6m0F78+yo3sbu48gElK4irv2dzPoep8oo9LEjxviigcnnnNvnTOJRSrIhuFk68FMLOpiNz+T77nNY89rnWDg==" crossorigin="anonymous"></script>
+{% endblock %}
+{% block vue-data %}
+                title:"",
+                valid: true,
+                selected: null,
+                backendMessages: "",
+                listofprojects:[],
+                projectDialog:false,
+                pName:"",
+                formError:false,
+                error:false
+{% endblock %}
+
+{% block vue-methods %}
+            register() {
+            this.$refs.form.validate()
+            },
+            createProject(){
+                let project={
+                    "name":this.pName,
+                    
+                }
+                if(this.pName){
+                    axios.post('{{HTTP_HOST}}/projects/',project, {"headers": {"X-CSRFToken":"{{ csrf_token }}"}})
+                .then(res=>{
+                    location.reload();
+                }).catch(
+                    err=>{
+                        this.error=true
+                    }
+                )
+                }else{
+                    this.formError=true
+                }
+                
+            },
+
+            deleteProject(id,name){
+              let confirm = prompt(`Warning!! Deleting the project ${name} will result in permanently deleting all its subsequent endpoints.\n if you with to proceed please type in projects name then click OK`)
+              if (confirm==name){
+                
+                axios.delete(`{{HTTP_HOST}}/project/${id}/delete/`, {"headers": {"X-CSRFToken":"{{ csrf_token }}"}}).then(res=>{
+                  location.reload();
+                })
+              }else{
+                alert("Deletion Confirmation Failed")
+              }
+            },
+{% endblock %}
+
+{% block vue-mounted %}
+axios.get('{{HTTP_HOST}}/projects/')
+.then(res=>{
+    this.listofprojects=res.data
+})
+{% endblock %}
